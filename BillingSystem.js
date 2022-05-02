@@ -23,6 +23,8 @@ const products=[
 
 ];
 
+
+
 const categories = ['Beverages','Chocolates','Biscuits'];
 
 const stocks = ['Yes','No'];
@@ -44,6 +46,8 @@ function show(active=0,defaultArr = products){
 	active === 1 ? str += showProductTable(defaultArr) : str += '';
 
 	document.getElementById('data').innerHTML = str;
+
+	let element = document.getElementById('data');
 
 }
 function makeBill(){
@@ -119,7 +123,7 @@ function showProductTable(productsArr = products){
 	filterRow += '<div class="col-3">'+makeDropdown('priceRangeId',priceRange,'Select Price Range',selectedDropDownValues.price)+'</div>';
 	filterRow += '</div>';
 
-	console.log(productsArr);
+	// console.log(productsArr);
 
 	const arr = productsArr.map( (pr,index) => {
 
@@ -186,16 +190,35 @@ function sort(colNo){
 
 	sortedColumnNumber = colNo;
 
-	switch(colNo){
 
-		case 0 : products.sort((p1,p2) => p1.code.localeCompare(p2.code)); break;
-		case 1 : products.sort((p1,p2) => p1.prod.localeCompare(p2.prod)); break;
-		case 2 : products.sort((p1,p2) => p1.category.localeCompare(p2.category)); break;
-		case 3 : products.sort((p1,p2) => (+p1.price)-(+p2.price)); break;
-		case 4 : products.sort((p1,p2) => p1.instock.localeCompare(p2.instock)); break;
+	console.log(filterArr);
+
+	if(filterArr.length > 0){
+		switch(colNo){
+
+			case 0 : filterArr.sort((p1,p2) => p1.code.localeCompare(p2.code)); break;
+			case 1 : filterArr.sort((p1,p2) => p1.prod.localeCompare(p2.prod)); break;
+			case 2 : filterArr.sort((p1,p2) => p1.category.localeCompare(p2.category)); break;
+			case 3 : filterArr.sort((p1,p2) => (+p1.price)-(+p2.price)); break;
+			case 4 : filterArr.sort((p1,p2) => p1.instock.localeCompare(p2.instock)); break;
+		}
+		showProduct(filterArr);
+	}else{
+
+		switch(colNo){
+
+			case 0 : products.sort((p1,p2) => p1.code.localeCompare(p2.code)); break;
+			case 1 : products.sort((p1,p2) => p1.prod.localeCompare(p2.prod)); break;
+			case 2 : products.sort((p1,p2) => p1.category.localeCompare(p2.category)); break;
+			case 3 : products.sort((p1,p2) => (+p1.price)-(+p2.price)); break;
+			case 4 : products.sort((p1,p2) => p1.instock.localeCompare(p2.instock)); break;
+		}
+		showProduct();
+
+
 	}
-	showProduct();
-
+	
+	
 }
 
 function filterData(element){
@@ -220,6 +243,10 @@ function filterData(element){
 }
 
 function filterProducts(){
+
+	console.log(selectedDropDownValues.cat === '');
+	console.log(selectedDropDownValues.stock === '');
+	console.log(selectedDropDownValues.price === '');
 
 	if(selectedDropDownValues.cat && !selectedDropDownValues.stock && !selectedDropDownValues.price){
 
@@ -294,6 +321,12 @@ function filterProducts(){
 
 		showProduct(filterArr);
 
+	}else if(selectedDropDownValues.cat === '' && selectedDropDownValues.stock === '' && selectedDropDownValues.price === ''){
+
+		filterArr = [];
+
+		showProduct();
+
 	}else {
 
 		showProduct();
@@ -327,8 +360,11 @@ function submitToBill(productInformation){
 
 		bill[index].value = bill[index].price * bill[index].quantity;
 
-
-		showProduct();
+		if(filterArr.length > 0){
+			showProduct(filterArr);	
+		}else{
+			showProduct();
+		}
 
 	}else {
 
@@ -340,8 +376,12 @@ function submitToBill(productInformation){
 
 		bill.push(billProduct);
 
-		showProduct();
-
+		if(filterArr.length > 0){
+			showProduct(filterArr);	
+		}else{
+			showProduct();
+		}
+		
 
 	}
 }
@@ -351,7 +391,7 @@ function incrementProductInBill(index){
 
 	bill[index].value = bill[index].price * bill[index].quantity;
 
-	showProduct();
+	(filterArr.length > 0) ? showProduct(filterArr) : showProduct();
 }
 function decrementProductInBill(index){
 
@@ -366,13 +406,14 @@ function decrementProductInBill(index){
 		bill.splice(index,1);
 
 	}
-	showProduct();
+	(filterArr.length > 0) ? showProduct(filterArr) : showProduct();
+
 }
 function removeProduct(index){
 
 	bill.splice(index,1);
-	showProduct();
 
+	(filterArr.length > 0) ? showProduct(filterArr) : showProduct();
 }
 function closeBill(){
 
